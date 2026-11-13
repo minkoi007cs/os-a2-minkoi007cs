@@ -5,6 +5,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+#include "pinfo.h"
 
 struct cpu cpus[NCPU];
 
@@ -14,6 +15,10 @@ struct proc *initproc;
 
 int nextpid = 1;
 struct spinlock pid_lock;
+// Serializes selection and the shared per-level round-robin cursors.
+// Acquired before any p->lock, never held across swtch().
+static struct spinlock run_lock;
+static int cursor[4];
 
 extern void forkret(void);
 static void freeproc(struct proc *p);
@@ -50,6 +55,9 @@ procinit(void)
   struct proc *p;
 
   initlock(&pid_lock, "nextpid");
+  initlock(&run_lock, "mlfq selection");
+  for (int i = 0; i < 4; i++)
+    cursor[i] = NPROC - 1;
   initlock(&wait_lock, "wait_lock");
   for (p = proc; p < &proc[NPROC]; p++) {
     initlock(&p->lock, "proc");
@@ -124,6 +132,12 @@ allocproc(void)
 found:
   p->pid = allocpid();
   p->state = USED;
+  p->level = 0;
+  p->usedticks = 0;
+  p->runticks = 0;
+  p->nsched = 0;
+  // Do not acquire tickslock while holding p->lock (inverse lock order).
+  p->ctime = ticks;
 
   // Allocate a trapframe page.
   if ((p->trapframe = (struct trapframe *)kalloc()) == 0) {
@@ -442,26 +456,32 @@ scheduler(void)
     intr_off();
 
     int found = 0;
-    for (p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
-      if (p->state == RUNNABLE) {
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
-
-        // Don't re-enable interrupts on release.
-        mycpu()->intena = 0;
-
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
-        found = 1;
+    acquire(&run_lock);
+    for (int level = 0; level < 4 && !found; level++) {
+      int start = cursor[level];
+      for (int off = 1; off <= NPROC; off++) {
+        int slot = (start + off) % NPROC;
+        p = &proc[slot];
+        acquire(&p->lock);
+        if (p->state == RUNNABLE && p->level == level) {
+          cursor[level] = slot;
+          p->state = RUNNING;
+          p->nsched++;
+          found = 1;
+          // Only p->lock is held when switching, as sched() requires.
+          release(&run_lock);
+          c->proc = p;
+          swtch(&c->context, &p->context);
+          mycpu()->intena = 0;
+          c->proc = 0;
+          release(&p->lock);
+          break;
+        }
+        release(&p->lock);
       }
-      release(&p->lock);
     }
+    if (!found)
+      release(&run_lock);
     if (found == 0) {
       // nothing to run; stop running on this core until an interrupt.
       asm volatile("wfi");
@@ -700,4 +720,80 @@ procdump(void)
     printk("%d %s %s", p->pid, state, p->name);
     printk("\n");
   }
+}
+
+// Charge a timer interrupt exactly once, regardless of user/kernel mode.
+// Never nest process locks when checking for higher-priority work.
+int
+mlfq_tick(struct proc *p)
+{
+  static const int slices[4] = {1, 2, 4, 8};
+  int level;
+  acquire(&p->lock);
+  p->runticks++;
+  p->usedticks++;
+  level = p->level;
+  if (p->usedticks >= slices[level]) {
+    if (p->level < 3)
+      p->level++;
+    p->usedticks = 0;
+    release(&p->lock);
+    return 1;
+  }
+  release(&p->lock);
+  for (struct proc *q = proc; q < &proc[NPROC]; q++) {
+    acquire(&q->lock);
+    int higher = q->state == RUNNABLE && q->level < level;
+    release(&q->lock);
+    if (higher)
+      return 1;
+  }
+  return 0;
+}
+
+// Caller holds tickslock. The global lock order is tickslock -> p->lock.
+void
+mlfq_boost(void)
+{
+  for (struct proc *p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+    if (p->state != UNUSED) {
+      p->level = 0;
+      p->usedticks = 0;
+    }
+    release(&p->lock);
+  }
+}
+
+int
+getpinfo(uint64 addr, int max)
+{
+  if (max < 0)
+    return -1;
+  int count = 0;
+  struct proc *caller = myproc();
+  for (struct proc *p = proc; p < &proc[NPROC] && count < max; p++) {
+    struct pinfo info;
+    acquire(&p->lock);
+    if (p->state == UNUSED) {
+      release(&p->lock);
+      continue;
+    }
+    memset(&info, 0, sizeof(info));
+    info.pid = p->pid;
+    info.state = p->state;
+    info.level = p->level;
+    info.runticks = p->runticks;
+    info.nsched = p->nsched;
+    info.ctime = p->ctime;
+    safestrcpy(info.name, p->name, sizeof(info.name));
+    release(&p->lock);
+    // copyout can allocate/fault: no process lock may be held here.
+    uint64 dest = addr + (uint64)count * sizeof(info);
+    if (dest < addr || copyout(caller->pagetable, caller->sz, dest, (char *)&info,
+                               sizeof(info)) < 0)
+      return -1;
+    count++;
+  }
+  return count;
 }

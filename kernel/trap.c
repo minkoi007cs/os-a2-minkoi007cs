@@ -78,11 +78,12 @@ usertrap(void)
     setkilled(p);
   }
 
+  // Account even a final timer tick on a process about to exit.
+  int preempt = which_dev == 2 && mlfq_tick(p);
   if (killed(p))
     kexit(-1);
 
-  // give up the CPU if this is a timer interrupt.
-  if (which_dev == 2)
+  if (preempt)
     yield();
 
   prepare_return();
@@ -154,7 +155,7 @@ kerneltrap()
   }
 
   // give up the CPU if this is a timer interrupt.
-  if (which_dev == 2 && myproc() != 0)
+  if (which_dev == 2 && myproc() != 0 && mlfq_tick(myproc()))
     yield();
 
   // the yield() may have caused some traps to occur,
@@ -169,6 +170,8 @@ clockintr()
   if (cpuid() == 0) {
     acquire(&tickslock);
     ticks++;
+    if (ticks % 64 == 0)
+      mlfq_boost();
     wakeup(&ticks);
     release(&tickslock);
   }

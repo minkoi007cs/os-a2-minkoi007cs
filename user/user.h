@@ -1,3 +1,5 @@
+struct pinfo;
+int getpinfo(struct pinfo *, int);
 #define SBRK_ERROR ((char *)-1)
 
 struct stat;

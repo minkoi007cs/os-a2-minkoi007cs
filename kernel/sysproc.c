@@ -110,3 +110,13 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_getpinfo(void)
+{
+  uint64 buf;
+  int max;
+  argaddr(0, &buf);
+  argint(1, &max);
+  return getpinfo(buf, max);
+}

@@ -79,6 +79,9 @@ void            panic(char*) __attribute__((noreturn));
 void            printkinit(void);
 
 // proc.c
+int             getpinfo(uint64, int);
+int             mlfq_tick(struct proc*);
+void            mlfq_boost(void);
 int             cpuid(void);
 void            kexit(int);
 int             kfork(void);
