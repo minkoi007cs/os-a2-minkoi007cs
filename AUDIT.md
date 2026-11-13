@@ -23,11 +23,13 @@ the missing official A2 starter.
    Required resolution: obtain the instructor's accessible A2 starter, port
    the changes onto its actual history without editing its supplied header,
    and run its public grader. Custom tests cannot replace that requirement.
-2. **Submission steps pending by design:** `main` is public under the required
-   repository name, but `a2-submit` is absent and no repository link has been
-   submitted to Canvas. The user requested review before submission. Tagging
-   and Canvas submission remain final actions after review and resolution of
-   finding 1.
+2. **Submission authorized; Canvas access unavailable:** the user has now
+   explicitly authorized tagging and Canvas submission. The tested solution is
+   being prepared as `a2-submit` on public `main`. Canvas submission has not
+   been completed: local browser use is disabled in Work settings and the
+   existing application database connection for the saved API token fails.
+   See SUBMISSION.md for the prepared repository link and outstanding checks.
+   Approval is no longer the blocker; access and finding 1 remain unresolved.
 3. **Identity omission - fixed:** the first draft had only the GitHub username
    in commit metadata, not the student's full name in the project documents.
    README and A2-NOTES.md now identify Khoi Ngoc Minh Hoang. No student number
@@ -55,7 +57,7 @@ the missing official A2 starter.
 | Boost every 64 global ticks on CPU 0 | clockintr -> mlfq_boost | Code review + observed boost test |
 | One process lock at a time; no scheduler selection lock over swtch | scheduler, mlfq_tick, mlfq_boost, getpinfo | Lock review + 3-CPU stress and usertests |
 | Public repository with required name and main | minkoi007cs/os-a2-minkoi007cs | Remote checked |
-| Push a2-submit tag; submit link on Canvas | Not done | Pending final approval; see finding 2 |
+| Push a2-submit tag; submit link on Canvas | Authorized; prepared for submission | See SUBMISSION.md; Canvas receipt not yet available |
 
 ## Available test evidence
 
