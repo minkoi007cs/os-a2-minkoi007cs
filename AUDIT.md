@@ -48,10 +48,10 @@ the missing official A2 starter.
 | Negative max/copy failure return -1; max=0 returns 0 | getpinfo | Runtime negative max, bad pointer and zero max |
 | Snapshot under p lock, copyout after unlocking | getpinfo | Lock review + failed-copyout test |
 | Four priorities, level 0 highest | scheduler loops 0 through 3 | Code review |
-| proc[] round robin using one cursor per level | cursor[4], run_lock, scheduler | Code review; no dedicated full ordering trace test |
+| proc[] round robin using one cursor per level | cursor[4], run_lock, scheduler | QEMU: two complete level-3 rounds in proc[] order, three fresh boots |
 | Time slices 1/2/4/8, bottom remains 3 | mlfq_tick | Exact one-CPU boundaries and dispatch-count checks |
-| Sleep/voluntary yield retain level and used time | sleep/yield do not reset either field | Code review; no dedicated early-yield boundary test |
-| Preempt for a higher-level RUNNABLE process; otherwise keep running | mlfq_tick scans after releasing own lock | Code review; no dedicated wakeup/preemption trace test |
+| Sleep/voluntary yield retain level and used time | sleep/yield do not reset either field | QEMU partial-slice sleep test; actual yield/sleep functions in host harness |
+| Preempt for a higher-level RUNNABLE process; otherwise keep running | mlfq_tick scans after releasing own lock | QEMU: higher-priority child runs on its wake tick; host partial-budget assertions |
 | Boost every 64 global ticks on CPU 0 | clockintr -> mlfq_boost | Code review + observed boost test |
 | One process lock at a time; no scheduler selection lock over swtch | scheduler, mlfq_tick, mlfq_boost, getpinfo | Lock review + 3-CPU stress and usertests |
 | Public repository with required name and main | minkoi007cs/os-a2-minkoi007cs | Remote checked |
@@ -65,7 +65,19 @@ the missing official A2 starter.
 - `usertests -q`, CPUS=3 on the unchanged kernel: ALL TESTS PASSED.
 - `git diff --check`: clean.
 
-The runtime checks cover useful behavior but do not exhaust every interleaving
-or the instructor's hidden tests. Round-robin ordering, early-yield budget
-retention, and higher-priority wakeup preemption were reviewed in source;
-there are no dedicated dynamic trace tests for those three properties yet.
+## Follow-up: policy coverage completed
+
+Added user/a2policy.c and tests/ with reproducible runners. The three policy
+coverage gaps from the initial audit now have targeted checks: round-robin and
+higher-priority wakeup have black-box QEMU traces; sleep retains partial budget
+in QEMU; voluntary yield is checked by compiling and invoking the actual
+kernel function in a host harness. The host harness is not an SMP simulator.
+
+Mutation checks require intentionally broken temporary variants to fail, so a
+regression cannot silently pass because the tested path was never exercised.
+The production kernel has not been changed: no concrete kernel defect was
+found by these tests. Tests and test-building errors were corrected during
+development; they are not reported as kernel defects.
+
+These checks do not exhaust concurrent interleavings or replace the official
+A2 starter/grader. Finding 1 and the pending submission steps remain open.

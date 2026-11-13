@@ -24,12 +24,21 @@ tests passed. No `make grade` target is fabricated.
 
 ## Build and test
 
-Use a RISC-V GCC toolchain and QEMU 7.2 or later:
+Use a RISC-V GCC toolchain and QEMU 7.2 or later. The reproducible additional
+student regression suite is documented in tests/README.md:
+
+```
+python3 tests/run_all.py
+python3 tests/test_qemu_mutations.py
+```
+
+For manual guest checks:
 
 ```
 make CPUS=1 qemu
 # xv6 shell:
 a2check behavior
+a2policy
 # Quit with Ctrl-A, X. Restart:
 make CPUS=3 qemu
 # xv6 shell:

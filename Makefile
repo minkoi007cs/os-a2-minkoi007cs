@@ -131,6 +131,7 @@ mkfs/mkfs: mkfs/mkfs.c $K/fs.h $K/param.h
 
 UPROGS=\
 	$U/_a2check\
+	$U/_a2policy\
 	$U/_cat\
 	$U/_echo\
 	$U/_forktest\

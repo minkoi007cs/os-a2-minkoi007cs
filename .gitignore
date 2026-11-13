@@ -10,3 +10,7 @@ _*
 /user/usys.S
 .gdbinit
 TAGS
+
+/tests/logs/
+
+/tests/__pycache__/

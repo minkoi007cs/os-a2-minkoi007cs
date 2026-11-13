@@ -1,0 +1,3 @@
+$ a2check
+A2CHECK PASS: ABI, copyout, counters, fork reset, scheduling, stress
+$ QEMU: Terminated
