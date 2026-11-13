@@ -1,5 +1,9 @@
 # A2: CPU scheduling
 
+Student: **Khoi Ngoc Minh Hoang**
+Course: Fall 2026 OPERATING SYSTEMS (CS-33211-001)
+GitHub: `minkoi007cs`
+
 Implements syscall 23 `getpinfo(struct pinfo *, int)` and four-level MLFQ:
 1, 2, 4, 8 tick slices, per-level proc-table round robin, no forgiveness on
 sleep/voluntary yield, higher-level preemption, global boost every 64 ticks.
