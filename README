@@ -6,7 +6,8 @@ GitHub: minkoi007cs
 Implementation: getpinfo (syscall 23) and four-level MLFQ scheduling.
 See A2-NOTES.md for setup, implementation and the unresolved A2 starter issue.
 See VERIFICATION.md for test results and AUDIT.md for acceptance findings.
-Submission status: NOT SUBMITTED TO CANVAS.
+Canvas submission confirmed: November 13, 2026 at 10:37pm (America/New_York).
+The grading ref is a2-submit. See SUBMISSION.md and VERIFICATION.md.
 
 Original xv6 README and acknowledgments follow:
 

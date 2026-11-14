@@ -10,18 +10,21 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--cpus', type=int, choices=(1, 3), required=True)
 parser.add_argument('--command', required=True)
 parser.add_argument('--repeat', type=int, default=1)
+parser.add_argument('--runs-per-boot', type=int, default=1)
 parser.add_argument('--log-dir', type=Path, default=ROOT / 'tests' / 'logs')
 parser.add_argument('--timeout', type=int, default=900)
 args = parser.parse_args()
 if args.command in ('a2policy', 'a2check behavior') and args.cpus != 1:
     parser.error('deterministic policy assertions require CPUS=1')
-if args.repeat < 1:
-    parser.error('repeat must be positive')
+if args.repeat < 1 or args.runs_per_boot < 1:
+    parser.error('repeat and runs-per-boot must be positive')
 expected = {
     'a2policy': 'A2POLICY ALL TESTS PASSED (CPUS=1)',
     'a2check': 'A2CHECK PASS:',
     'a2check behavior': 'A2CHECK PASS:',
     'usertests -q': 'ALL TESTS PASSED',
+    'usertests reparent': 'ALL TESTS PASSED',
+    'forktest': 'fork test OK',
 }
 if args.command not in expected:
     parser.error('command has no registered success marker')
@@ -34,14 +37,16 @@ for i in range(1, args.repeat + 1):
         child.logfile_read = log
         try:
             child.expect_exact('$ ')
-            child.sendline(args.command)
-            child.expect_exact('$ ')
-            output = child.before
-            if expected[args.command] not in output or re.search(
-                    r'(?:A2\w* FAIL:|\bpanic:|SOME TESTS FAILED)', output):
-                raise RuntimeError(f'guest did not pass; see {log_path}\n{output[-3000:]}')
+            for run in range(1, args.runs_per_boot + 1):
+                child.sendline(args.command)
+                child.expect_exact('$ ')
+                output = child.before
+                if expected[args.command] not in output or re.search(
+                        r'(?:A2\w* FAIL:|\bpanic:|SOME TESTS FAILED)', output):
+                    raise RuntimeError(f'guest run {run} did not pass; see {log_path}\n{output[-3000:]}')
             child.send('\x01x')
             child.expect(pexpect.EOF)
         finally:
             child.close(force=True)
-    print(f'PASS {args.cpus} CPU {args.command} run {i}/{args.repeat}: {log_path}', flush=True)
+    print(f'PASS {args.cpus} CPU {args.command} boot {i}/{args.repeat}, '
+          f'{args.runs_per_boot} runs: {log_path}', flush=True)

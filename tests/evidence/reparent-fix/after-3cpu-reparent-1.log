@@ -1,0 +1,82 @@
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ QEMU: Terminated
+

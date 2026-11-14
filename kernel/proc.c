@@ -267,6 +267,33 @@ growproc(int n)
   return 0;
 }
 
+// Strict MLFQ priority can postpone init until the next boost while fresh
+// level-0 children fill proc[]. Reclaim only adopted zombies under pressure:
+// their original parent is gone, and init would only discard their status.
+// Keep init's own children (in particular the shell) and all other parents'
+// children available to wait(). As in kwait(), p->lock also waits for the
+// exiting process to finish switching off its kernel stack before freeproc().
+static int
+reap_orphans(void)
+{
+  int reaped = 0;
+  acquire(&wait_lock);
+  for (struct proc *p = proc; p < &proc[NPROC]; p++) {
+    if (p->parent != initproc || !p->orphaned)
+      continue;
+    acquire(&p->lock);
+    if (p->state == ZOMBIE) {
+      p->parent = 0;
+      p->orphaned = 0;
+      freeproc(p);
+      reaped++;
+    }
+    release(&p->lock);
+  }
+  release(&wait_lock);
+  return reaped;
+}
+
 // Create a new process, copying the parent.
 // Sets up child kernel stack to return as if from fork() system call.
 int
@@ -277,7 +304,10 @@ kfork(void)
   struct proc *p = myproc();
 
   // Allocate process.
-  if ((np = allocproc()) == 0) {
+  np = allocproc();
+  if (np == 0 && reap_orphans() > 0)
+    np = allocproc();
+  if (np == 0) {
     return -1;
   }
 
@@ -309,6 +339,7 @@ kfork(void)
 
   acquire(&wait_lock);
   np->parent = p;
+  np->orphaned = 0;
   release(&wait_lock);
 
   acquire(&np->lock);
@@ -328,6 +359,7 @@ reparent(struct proc *p)
   for (pp = proc; pp < &proc[NPROC]; pp++) {
     if (pp->parent == p) {
       pp->parent = initproc;
+      pp->orphaned = 1;
       wakeup(initproc);
     }
   }
@@ -409,6 +441,7 @@ kwait(uint64 addr)
             return -1;
           }
           pp->parent = 0;
+          pp->orphaned = 0;
           freeproc(pp);
           release(&pp->lock);
           release(&wait_lock);

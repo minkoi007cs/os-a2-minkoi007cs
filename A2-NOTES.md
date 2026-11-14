@@ -8,7 +8,7 @@ Implements syscall 23 `getpinfo(struct pinfo *, int)` and four-level MLFQ:
 1, 2, 4, 8 tick slices, per-level proc-table round robin, no forgiveness on
 sleep/voluntary yield, higher-level preemption, global boost every 64 ticks.
 
-## Starter provenance - unresolved before submission
+## Starter provenance - still unresolved
 
 On 2026-11-12 the PDF's URL, https://github.com/guanslab/xv6-a2-starter,
 returned "Repository not found". The instructor's public repositories listed
@@ -18,7 +18,7 @@ its history. `kernel/pinfo.h` was transcribed from the A2 PDF with exactly the
 specified field order and a 40-byte layout.
 
 This is a provisional implementation. The official A2 starter, its header and
-public tests must be compared before submission. Its missing commit history
+public tests still need to be obtained and compared. Its missing commit history
 cannot be manufactured. No claim is made that the official A2 public or hidden
 tests passed. No `make grade` target is fabricated.
 
@@ -57,3 +57,29 @@ before context switching. The tick scanner holds at most one process lock.
 The boost uses `tickslock -> p->lock`. getpinfo snapshots each process under
 its lock, then releases it before copyout. allocproc reads ticks without taking
 tickslock to avoid reversing that order.
+
+## Reparent regression and orphan reclamation (2026-11-13)
+
+Repeated `usertests reparent` on CPUS=3 exposed process-table exhaustion.
+Diagnostics in an isolated copy showed all 64 slots occupied, init RUNNABLE
+at level 1, and most other entries ZOMBIE at level 0. Fresh level-0 forks
+could defer init long enough that it could not reap adopted children before
+the next fork needed a slot. The old assertion that all tests always pass
+was incorrect: the original kernel passed some runs and failed others.
+
+The fix marks children adopted after their original parent exits. If process
+allocation fails, kfork reclaims only adopted ZOMBIE children of init under
+wait_lock -> p->lock, then retries allocation once if anything was reclaimed.
+The original parent is gone and init discards these exit statuses. Init's
+own children, including its shell, and all children of other live parents
+remain available to wait(). The process lock prevents freeing a zombie that
+has not finished switching away from its kernel stack. Exhaustion without
+reclaimable orphans still returns -1; fork does not wait indefinitely.
+
+The four MLFQ levels, time slices, round-robin cursors, no-forgiveness rule,
+64-tick boost, getpinfo ABI, and the original usertests are unchanged.
+`orphaned` is internal kernel state protected by wait_lock and is reset when
+assigning a new child's parent and when removing a reaped child.
+
+The regression runner now supports repeated commands in one boot. Fresh boots
+alone missed the accumulation that exposed the original failure. See tests/README.md and VERIFICATION.md for the exact validation and its limits.

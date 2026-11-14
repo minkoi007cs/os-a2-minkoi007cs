@@ -1,0 +1,5 @@
+$ a2policy
+A2POLICY FAIL: sleep erased consumed budget
+A2POLICY FAIL: child failed
+$ QEMU: Terminated
+

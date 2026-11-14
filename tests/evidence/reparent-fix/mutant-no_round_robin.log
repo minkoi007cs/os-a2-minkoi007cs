@@ -1,0 +1,5 @@
+$ a2policy
+A2POLICY PASS: sleep preserves partial time slice
+A2POLICY FAIL: proc-table round robin order
+$ QEMU: Terminated
+

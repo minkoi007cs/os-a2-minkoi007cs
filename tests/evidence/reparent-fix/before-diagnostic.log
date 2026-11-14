@@ -1,0 +1,86 @@
+ISOLATED DIAGNOSTIC COPY: extra getpinfo printing in the reparent failure branch only.
+Not production or submitted usertests.
+
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: OK
+ALL TESTS PASSED
+$ usertests reparent
+usertests starting
+test reparent: DIAG reparent fork failed: entries=64
+DIAG pid=1 state=3 level=1 rt=3 ns=583 name=init
+DIAG pid=2 state=2 level=0 rt=0 ns=15 name=sh
+DIAG pid=1209 state=2 level=3 rt=8 ns=43 name=usertests
+DIAG pid=1210 state=2 level=0 rt=0 ns=73 name=usertests
+DIAG pid=1355 state=4 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1238 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1240 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1242 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1244 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1246 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1248 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1250 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1252 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1254 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1256 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1258 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1260 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1262 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1264 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1266 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1268 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1270 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1272 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1274 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1276 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1278 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1280 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1282 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1284 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1286 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1288 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1290 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1292 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1294 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1296 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1298 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1300 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1302 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1304 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1306 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1308 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1310 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1312 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1314 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1316 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1318 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1320 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1322 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1324 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1326 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1328 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1330 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1332 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1334 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1336 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1338 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1340 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1342 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1344 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1346 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1348 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1350 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1352 state=5 level=0 rt=0 ns=1 name=usertests
+DIAG pid=1354 state=5 level=0 rt=0 ns=1 name=usertests
+FAILED
+SOME TESTS FAILED
+$ QEMU: Terminated
+

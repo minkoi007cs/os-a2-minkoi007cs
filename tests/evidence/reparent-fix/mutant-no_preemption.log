@@ -1,0 +1,6 @@
+$ a2policy
+A2POLICY PASS: sleep preserves partial time slice
+A2POLICY PASS: proc-table round robin, two complete level-3 rounds
+A2POLICY FAIL: higher-priority wakeup waited for slice end
+$ QEMU: Terminated
+

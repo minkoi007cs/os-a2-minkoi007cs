@@ -1,0 +1,6 @@
+$ usertests reparent
+usertests starting
+test reparent: FAILED
+SOME TESTS FAILED
+$ QEMU: Terminated
+

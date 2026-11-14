@@ -1,0 +1,11 @@
+$ forktest
+fork test
+fork test OK
+$ forktest
+fork test
+fork test OK
+$ forktest
+fork test
+fork test OK
+$ QEMU: Terminated
+
